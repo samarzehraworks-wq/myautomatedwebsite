@@ -573,12 +573,18 @@ function csend() {
   const text = inp.value.trim(); if(!text) return;
   inp.value = ''; document.getElementById('csendbtn').disabled = true;
   caddMsg('user', text); cshowTyping();
-  setTimeout(() => {
+  fetch('/.netlify/functions/chat', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({message: text})
+  })
+  .then(r => r.json())
+  .then(data => {
     cremoveTyping();
-    caddMsg('bot', cprocess(text));
+    caddMsg('bot', data.reply);
     document.getElementById('csendbtn').disabled = false;
     inp.focus();
-  }, 500 + Math.random()*400);
+  });
 }
 document.getElementById('cinput').addEventListener('keydown', e => { if(e.key==='Enter') csend(); });
 caddMsg('bot', "Hey there! Welcome to Brew Haven ☕\n\nI can show you our menu, answer questions, or take your order. What can I do for you?");
